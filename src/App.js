@@ -4,6 +4,9 @@ import './App.css';
 import Person from './Person/Person'; 
 import UserInput from './UserInput/UserInput';
 import UserOutput from './UserOutput/UserOutput';
+import Validation from './Components/Validation'
+import CharComponent from './Components/CharComponent'
+import userInput from './UserInput/UserInput';
 class App extends Component {
   state={
     persons:[
@@ -11,12 +14,19 @@ class App extends Component {
       {name:"James",year:28,userName:"400+Bowler"},
       {name:"Ricciardo",year:35,userName:"Oz"}
     ],
-    showPersons:false
+    showPersons:false,
+    userInput: ""
   }  
+
+  inputChangeHandler= (event) =>{
+    this.setState({
+      userInput:event.target.value
+    })
+  }
 
   nameChangeHandler=( event, id)=>{
     const personIndex=this.state.persons.findIndex(p =>{
-      return p.userName=id;
+      return p.userName===id;
     })
 
     const person={
@@ -46,9 +56,26 @@ class App extends Component {
     this.setState({showPersons:!res})
   }
 
+  deleteCharHandler=(charIndex) =>{
+    const userInput=[...this.state.userInput]
+    userInput.splice(charIndex,1);
+    const updatedUserInput=userInput.join('')
+    this.setState({userInput:userInput})
+  }
+
 
 
   render() {
+    const charList=this.state.userInput.toString().split(' ').map((ch,index) => {
+      return (
+        <CharComponent 
+          char={ch}
+          key={index}
+          changed={()=>this.deleteCharHandler(index)}
+        />
+      )
+    })
+
     const style={
       backgroundColor: "lightblue",
       font: 'inherit',
@@ -70,7 +97,6 @@ class App extends Component {
               name={persons.name} 
               age={persons.age}
               userName={persons.userName}
-              key={persons.userName}
               changed={(event) => this.nameChangeHandler(event,persons.userName)}
             />
           })}
@@ -110,6 +136,17 @@ class App extends Component {
             Switch Name
         </button>
         {persons}
+        <hr/>
+        <input 
+          type="text" 
+          onChange={this.inputChangeHandler}
+          value={this.state.userInput}/>
+        
+        <Validation 
+          inputLength={this.state.userInput.length}> 
+        </Validation>
+        <p>{this.state.userInput}</p>
+        {charList}
       </div>
     );
 
